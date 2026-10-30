@@ -1,50 +1,41 @@
-# Business Memo: COD Risk Engine
+# Decision Log — COD Risk Engine
 
-**To:** Founder  
-**Subject:** Reducing COD RTO risk through explainable decisions  
-**Project:** COD Risk Engine
+## 1. Configurable risk thresholds
+- **Decision:** Store risk thresholds and weights in `config.json`.
+- **Alternative considered:** Hard-code thresholds in `app.py`.
+- **Reason:** Non-technical team members can adjust the thresholds without changing Python code.
 
-## Executive summary
+## 2. Four risk-based actions
+- **Decision:** Use four actions: Ship as-is, Ship after confirmation, Nudge to prepaid, and Hold/cancel.
+- **Alternative considered:** Automatically cancel every high-risk order.
+- **Reason:** This balances reducing RTO costs with avoiding the loss of genuine customers.
 
-The COD Risk Engine uses configurable, rule-based scoring to recommend different actions for orders with different risk profiles. The historical dataset indicates that RTO is a meaningful operational cost. The proposed engine should be treated as a decision-support tool until its rules and interventions are validated using real experiment data.
+## 3. Rule-based risk scoring
+- **Decision:** Use Python rules for customer history, state, courier, address, and suspicious names.
+- **Alternative considered:** Use an LLM for every risk calculation.
+- **Reason:** Rules and calculations are predictable, easy to explain, and easier to test. An LLM could help with more complex address interpretation.
 
-## Historical findings
+## 4. Explainable decisions
+- **Decision:** Return a risk score, recommended action, and plain-English reasons.
+- **Alternative considered:** Return only a risk score.
+- **Reason:** Operations staff need to understand why an order received a particular recommendation.
 
-The supplied dataset contains 2,018 orders: 1,444 marked DELIVERED, 573 marked RTO, and one marked IN_TRANSIT.
+## 5. Mock confirmation flow
+- **Decision:** Build a chat simulator for confirmation and prepaid-offer scenarios.
+- **Alternative considered:** Integrate a live WhatsApp API.
+- **Reason:** A simulator demonstrates the workflow without requiring a real WhatsApp account or paid integration.
 
-1. **Historical RTO rate:** Among the 2,017 finalized orders, 573 were RTO, giving an RTO rate of 28.41%.
-2. **Delivery rate:** 1,444 of 2,017 finalized orders were delivered, a delivery rate of approximately 71.59%.
-3. **Estimated RTO cost:** At the assumed cost of ₹169.40 per RTO, 573 RTO orders represent an estimated cost of ₹97,066.20.
+## 6. Historical dashboard
+- **Decision:** Use the supplied historical order dataset to display delivery outcomes, RTO rates, and estimated RTO costs.
+- **Alternative considered:** Show only total order counts.
+- **Reason:** The business needs to understand both operational performance and financial impact.
 
-These figures describe the supplied historical dataset. They do not establish that the risk engine or any intervention has reduced RTO.
+## 7. Experiment measurement
+- **Decision:** Add an experiment-results CSV to compare control and intervention groups.
+- **Alternative considered:** Assume that historical risk-based decisions reduced RTO.
+- **Reason:** Historical associations alone do not prove that an intervention caused a reduction. Real experiment results are needed to evaluate impact.
 
-## Recommended operating approach
-
-Use configurable risk scores to separate orders into four actions: Ship as-is, Ship after confirmation, Nudge to prepaid, and Hold/cancel. Review high-risk recommendations before taking actions that could unnecessarily lose genuine customers.
-
-Continue the existing COD confirmation process. To evaluate an additional standardized confirmation intervention, randomly assign eligible orders to a control group that continues the normal process and an intervention group that receives the additional step. Track assignments before intervention, record delivery outcomes consistently, and compare finalized RTO rates.
-
-## Financial trade-offs
-
-The estimated ₹169.40 cost per RTO provides a starting point for financial evaluation. The business should compare the cost of additional confirmation, prepaid discounts, and operational reviews against the value of avoided RTOs.
-
-For example, the gross estimated savings from avoiding 10 RTOs would be ₹1,694 at the assumed cost per RTO, before accounting for intervention expenses, lost orders, discount costs, or other effects. This is an illustration, not a measured saving.
-
-## Risks and limitations
-
-- Historical associations do not demonstrate causation.
-- Incorrect risk scores may inconvenience genuine customers or lead to lost sales.
-- The assumed RTO cost may not capture every relevant cost or recovery.
-- The current experiment-results file has no records, so intervention effectiveness remains unknown.
-
-## Priorities for the next two weeks
-
-1. Validate risk rules and thresholds with operations staff.
-2. Add automated tests for scoring boundaries and invalid inputs.
-3. Establish a randomized control/intervention process with consistent outcome tracking.
-4. Collect finalized outcomes and assess RTO differences, sample size, and uncertainty.
-5. Review customer complaints, lost orders, prepaid conversion, and intervention costs alongside RTO rate.
-
-## Recommendation
-
-Use the COD Risk Engine as an explainable decision-support tool while validating its rules. Run a properly controlled experiment before claiming that additional confirmation reduces RTO or produces financial savings.
+## 8. Current limitations
+- The confirmation flow is a mock, not a live WhatsApp integration.
+- The experiment-results file currently contains headers only; real-world intervention impact has not yet been measured.
+- The risk thresholds and weights require further validation using appropriate test data and business outcomes.
