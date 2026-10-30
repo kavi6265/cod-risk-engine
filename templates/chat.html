@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Simulator | COD Risk Engine</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef3f8;
+            color: #172b4d;
+        }
+
+        .navbar {
+            background: #ffffff;
+            padding: 18px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+        }
+
+        .navbar h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .navbar a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .page-title {
+            margin-bottom: 24px;
+        }
+
+        .page-title h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .page-title p {
+            color: #64748b;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.9fr);
+            gap: 24px;
+            align-items: start;
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.07);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            font-size: 21px;
+        }
+
+        .chat-window {
+            border: 1px solid #dbe4ea;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #d1fae5;
+            color: #065f46;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .chat-header h3 {
+            margin: 0 0 4px;
+        }
+
+        .chat-header small {
+            color: #d1fae5;
+        }
+
+        .chat-body {
+            height: 390px;
+            overflow-y: auto;
+            padding: 18px;
+            background-color: #e5ddd5;
+            background-image: radial-gradient(
+                rgba(255,255,255,0.25) 1px,
+                transparent 1px
+            );
+            background-size: 18px 18px;
+        }
+
+        .message {
+            max-width: 85%;
+            padding: 11px 13px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            white-space: pre-wrap;
+        }
+
+        .seller {
+            background: #d9fdd3;
+            margin-left: auto;
+            border-top-right-radius: 3px;
+        }
+
+        .customer {
+            background: white;
+            margin-right: auto;
+            border-top-left-radius: 3px;
+        }
+
+        .message-time {
+            display: block;
+            color: #64748b;
+            text-align: right;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 14px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 9px;
+            padding: 11px 15px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.88;
+        }
+
+        .reply-button {
+            background: white;
+            color: #087f6e;
+            border: 1px solid #087f6e;
+        }
+
+        .primary-button {
+            background: #2563eb;
+            color: white;
+        }
+
+        .secondary-button {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .danger-button {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 8px;
+            padding: 12px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-area input {
+            flex: 1;
+            min-width: 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 17px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 7px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 9px;
+            font-size: 14px;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: 2px solid #bfdbfe;
+            border-color: #2563eb;
+        }
+
+        .full-width {
+            width: 100%;
+        }
+
+        .risk-result {
+            margin-top: 22px;
+            padding: 18px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .risk-result h3 {
+            margin: 0 0 12px;
+        }
+
+        .risk-score {
+            font-size: 34px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .risk-meter {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 12px 0;
+        }
+
+        .risk-meter-fill {
+            height: 100%;
+            width: 0;
+            background: #16a34a;
+            transition: width 0.3s;
+        }
+
+        .result-action {
+            font-weight: bold;
+            margin: 12px 0;
+        }
+
+        .result-reason {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .notice {
+            margin-top: 18px;
+            font-size: 12px;
+            line-height: 1.6;
+            color: #64748b;
+        }
+
+        .error {
+            color: #b91c1c;
+            margin-top: 12px;
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                margin-top: 20px;
+                padding: 0 12px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .page-title h1 {
+                font-size: 25px;
+            }
+
+            .chat-body {
+                height: 330px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="navbar">
+    <h2>COD Risk Engine</h2>
+    <a href="/dashboard">← Back to Dashboard</a>
+</header>
+
+<main class="container">
+
+    <div class="page-title">
+        <h1>WhatsApp Simulator</h1>
+        <p>Simulate customer responses and assess Cash on Delivery order risk.</p>
+    </div>
+
+    <div class="layout">
+
+        <!-- WhatsApp simulation -->
+        <section class="card">
+            <h2>Customer Conversation</h2>
+
+            <div class="chat-window">
+
+                <div class="chat-header">
+                    <div class="avatar">R</div>
+                    <div>
+                        <h3 id="chatCustomerName">Ravi Kumar</h3>
+                        <small>COD Order · Simulation</small>
+                    </div>
+                </div>
+
+                <div class="chat-body" id="chatBody" aria-live="polite">
+                    <div class="message seller">
+                        Hello Ravi! 👋
+
+                        Thank you for placing your order. Your order is currently Cash on Delivery.
+
+                        Please confirm whether you would like to receive it.
+                        <span class="message-time">Now</span>
+                    </div>
+
+                    <div class="message customer">
+                        Hello, I would like to know more about my order.
+                        <span class="message-time">Now</span>
+                    </div>
+                </div>
+
+                <div class="quick-replies">
+                    <button class="reply-button" onclick="sendQuickReply('YES')">YES</button>
+                    <button class="reply-button" onclick="sendQuickReply('NO')">NO</button>
+                    <button class="reply-button" onclick="sendQuickReply('RANDOM')">Random reply</button>
+                    <button class="reply-button" onclick="sendQuickReply('PREPAID')">Accept prepaid</button>
+                </div>
+                <div class="quick-replies" style="border-top:0; padding-top:0;">
+                    <button class="secondary-button full-width" onclick="simulateTimeout()">Simulate 24-hour timeout</button>
+                </div>
+
+                <form class="input-area" id="chatForm">
+                    <input
+                        type="text"
+                        id="messageInput"
+                        placeholder="Type a simulated message..."
+                        autocomplete="off"
+                    >
+                    <button class="primary-button" type="submit">Send</button>
+                </form>
+
+            </div>
+
+            <button class="secondary-button full-width"
+                    style="margin-top: 14px;"
+                    onclick="resetChat()">
+                Reset Conversation
+            </button>
+
+            <p class="notice">
+                This is a demonstration. Messages are displayed locally and
+                are not sent to WhatsApp or the customer.
+            </p>
+        </section>
+
+        <!-- Order details and risk assessment -->
+        <section class="card">
+            <h2>Order Details</h2>
+
+            <form id="orderForm">
+
+                <div class="form-group">
+                    <label for="customerName">Customer Name</label>
+                    <input id="customerName" type="text"
+                           value="Ravi Kumar" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">Delivery Address</label>
+                    <input id="address" type="text"
+                           value="12 Main Road, Salem, Tamil Nadu"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label for="state">State</label>
+                    <select id="state">
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Bihar">Bihar</option>
+                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                        <option value="Assam">Assam</option>
+                        <option value="Rajasthan">Rajasthan</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Telangana">Telangana</option>
+                        <option value="West Bengal">West Bengal</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="previousRto">Previous RTO Count</label>
+                    <input id="previousRto" type="number"
+                           min="0" value="0" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="courier">Courier</label>
+                    <select id="courier">
+                        <option value="Delhivery">Delhivery</option>
+                        <option value="Xpressbees">Xpressbees</option>
+                        <option value="Ecom Express">Ecom Express</option>
+                        <option value="BlueDart">BlueDart</option>
+                        <option value="Shadowfax">Shadowfax</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="utmSource">Marketing Source</label>
+                    <select id="utmSource">
+                        <option value="direct">Direct</option>
+                        <option value="meta_ads">Meta Ads</option>
+                        <option value="instagram_organic">Instagram Organic</option>
+                        <option value="google_ads">Google Ads</option>
+                        <option value="influencer">Influencer</option>
+                        <option value="whatsapp_broadcast">WhatsApp Broadcast</option>
+                    </select>
+                </div>
+
+                <button class="primary-button full-width"
+                        id="assessButton" type="submit">
+                    Assess Order Risk
+                </button>
+
+            </form>
+
+            <div class="risk-result" id="riskResult" aria-live="polite">
+                <h3>Assessment Result</h3>
+                <p>Submit the order details to calculate the risk score.</p>
+            </div>
+
+        </section>
+    </div>
+</main>
+
+<script>
+const chatBody = document.getElementById("chatBody");
+const chatForm = document.getElementById("chatForm");
+const messageInput = document.getElementById("messageInput");
+const customerNameInput = document.getElementById("customerName");
+const riskResult = document.getElementById("riskResult");
+const assessButton = document.getElementById("assessButton");
+
+const ORDER_VALUE = 649;
+const PREPAID_DISCOUNT = 30;
+let conversationState = "idle";
+
+function addMessage(sender, text) {
+    const bubble = document.createElement("div");
+    bubble.className = "message " + sender;
+    bubble.textContent = text;
+    const time = document.createElement("span");
+    time.className = "message-time";
+    time.textContent = "Now";
+    bubble.appendChild(time);
+    chatBody.appendChild(bubble);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function startMockFlow(data) {
+    const name = customerNameInput.value.trim() || "Customer";
+    conversationState = "idle";
+
+    if (data.action === "Ship as-is") {
+        addMessage("seller", `Hi ${name}! Thanks for your order. It passed the initial checks and is ready for normal processing.`);
+        conversationState = "complete";
+    } else if (data.action === "Ship after confirmation") {
+        addMessage("seller", `Hi ${name}! Please confirm your COD order. Reply YES to confirm or NO to request cancellation. We will wait up to 24 hours.`);
+        conversationState = "awaiting_confirmation";
+    } else if (data.action === "Nudge to prepaid") {
+        addMessage("seller", `Hi ${name}! Your order value is ₹${ORDER_VALUE}. Pay online and get a ₹${PREPAID_DISCOUNT} discount. Prepaid total: ₹${ORDER_VALUE - PREPAID_DISCOUNT}. Reply PREPAID to choose prepaid, YES to keep COD, or NO to request cancellation. This is a mock offer; no payment is collected.`);
+        conversationState = "awaiting_prepaid_choice";
+    } else {
+        addMessage("seller", `This order has risk score ${data.risk_score}/100 and is placed on hold for manual review in this simulation. It has not been automatically cancelled.`);
+        conversationState = "manual_review";
+    }
+}
+
+function handleCustomerReply(text) {
+    const reply = text.trim().toUpperCase();
+
+    if (conversationState === "awaiting_confirmation") {
+        if (["YES", "Y", "CONFIRM", "CONFIRM ORDER"].includes(reply)) {
+            addMessage("seller", "Thank you! Your order is marked CONFIRMED in this simulation.");
+            conversationState = "confirmed";
+        } else if (["NO", "N", "CANCEL", "CANCEL ORDER"].includes(reply)) {
+            addMessage("seller", "Your cancellation request is recorded for review. No real order has been cancelled.");
+            conversationState = "cancellation_requested";
+        } else {
+            addMessage("seller", "Sorry, I didn't understand. Please reply YES to confirm or NO to request cancellation. The 24-hour window remains open.");
+        }
+        return;
+    }
+
+    if (conversationState === "awaiting_prepaid_choice") {
+        if (["PREPAID", "PAY ONLINE", "ACCEPT PREPAID", "DISCOUNT"].includes(reply)) {
+            addMessage("seller", `Prepaid selected in this simulation. ₹${ORDER_VALUE} − ₹${PREPAID_DISCOUNT} discount = ₹${ORDER_VALUE - PREPAID_DISCOUNT}. No payment transaction is created.`);
+            conversationState = "prepaid_selected";
+        } else if (["YES", "COD", "KEEP COD"].includes(reply)) {
+            addMessage("seller", "Your order remains COD in this simulation.");
+            conversationState = "cod_kept";
+        } else if (["NO", "CANCEL", "CANCEL ORDER"].includes(reply)) {
+            addMessage("seller", "Your cancellation request is recorded for review. No real order has been cancelled.");
+            conversationState = "cancellation_requested";
+        } else {
+            addMessage("seller", "Please reply PREPAID, YES to keep COD, or NO to request cancellation.");
+        }
+        return;
+    }
+
+    if (conversationState === "timed_out") {
+        addMessage("seller", "The 24-hour window has expired. The order is marked NO RESPONSE and sent for manual review.");
+        return;
+    }
+
+    addMessage("seller", "There is no pending customer question. Assess an order to start the mock flow.");
+}
+
+function sendQuickReply(reply) {
+    const text = reply === "RANDOM" ? "Can you tell me more?" : reply;
+    addMessage("customer", text);
+    handleCustomerReply(text);
+}
+
+function simulateTimeout() {
+    if (!["awaiting_confirmation", "awaiting_prepaid_choice"].includes(conversationState)) {
+        addMessage("seller", "No active confirmation or prepaid request to time out. Assess an order first.");
+        return;
+    }
+    addMessage("seller", "SIMULATION: 24 hours have passed with no customer reply.");
+    addMessage("seller", "Timeout rule: mark NO RESPONSE and send to manual review. Do not automatically cancel only because the customer did not reply.");
+    conversationState = "timed_out";
+}
+
+chatForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+    const text = messageInput.value.trim();
+    if (!text) return;
+    addMessage("customer", text);
+    messageInput.value = "";
+    handleCustomerReply(text);
+});
+
+customerNameInput.addEventListener("input", function() {
+    const name = customerNameInput.value.trim() || "Customer";
+    document.getElementById("chatCustomerName").textContent = name;
+    document.querySelector(".avatar").textContent = name.charAt(0).toUpperCase();
+});
+
+document.getElementById("orderForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    const previousRto = Number(document.getElementById("previousRto").value);
+    if (!Number.isInteger(previousRto) || previousRto < 0) {
+        showError("Previous RTO count must be a non-negative whole number.");
+        return;
+    }
+
+    const order = {
+        customer_name: customerNameInput.value.trim(),
+        address: document.getElementById("address").value.trim(),
+        state: document.getElementById("state").value,
+        customer_prior_rto: previousRto,
+        courier: document.getElementById("courier").value,
+        utm_source: document.getElementById("utmSource").value
+    };
+
+    if (!order.customer_name || !order.address) {
+        showError("Enter the customer name and delivery address.");
+        return;
+    }
+
+    assessButton.disabled = true;
+    assessButton.textContent = "Assessing...";
+    riskResult.replaceChildren();
+    const loading = document.createElement("p");
+    loading.textContent = "Calculating order risk...";
+    riskResult.appendChild(loading);
+
+    try {
+        const response = await fetch("/assess", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(order)
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Unable to assess the order.");
+
+        renderRiskResult(data);
+        addMessage("seller", `Risk assessment completed. Recommended action: ${data.action}. Risk score: ${data.risk_score}/100.`);
+        startMockFlow(data);
+    } catch (error) {
+        showError(error.message);
+    } finally {
+        assessButton.disabled = false;
+        assessButton.textContent = "Assess Order Risk";
+    }
+});
+
+function renderRiskResult(data) {
+    riskResult.replaceChildren();
+    const heading = document.createElement("h3");
+    heading.textContent = "Assessment Result";
+    riskResult.appendChild(heading);
+
+    const score = Math.max(0, Math.min(100, Number(data.risk_score) || 0));
+    const scoreLine = document.createElement("div");
+    scoreLine.className = "risk-score";
+    scoreLine.textContent = `${score}/100`;
+    scoreLine.style.color = score >= 70 ? "#dc2626" : score >= 40 ? "#d97706" : "#16a34a";
+    riskResult.appendChild(scoreLine);
+
+    const action = document.createElement("p");
+    action.className = "result-action";
+    action.textContent = `Recommended action: ${data.action}`;
+    riskResult.appendChild(action);
+
+    const reason = document.createElement("p");
+    reason.className = "result-reason";
+    reason.textContent = `Reason: ${data.reason}`;
+    riskResult.appendChild(reason);
+
+    if (data.action === "Nudge to prepaid") {
+        const offer = document.createElement("p");
+        offer.className = "result-reason";
+        offer.textContent = `Mock discount maths: ₹${ORDER_VALUE} − ₹${PREPAID_DISCOUNT} = ₹${ORDER_VALUE - PREPAID_DISCOUNT}.`;
+        riskResult.appendChild(offer);
+    }
+}
+
+function showError(message) {
+    riskResult.replaceChildren();
+    const heading = document.createElement("h3");
+    heading.textContent = "Assessment Error";
+    const detail = document.createElement("p");
+    detail.className = "error";
+    detail.textContent = message;
+    riskResult.append(heading, detail);
+}
+
+function resetChat() {
+    chatBody.replaceChildren();
+    addMessage("seller", "Welcome to the COD Risk Engine WhatsApp simulator. Assess an order to start the matching mock message flow.");
+    conversationState = "idle";
+    riskResult.replaceChildren();
+    const heading = document.createElement("h3");
+    heading.textContent = "Assessment Result";
+    const message = document.createElement("p");
+    message.textContent = "Submit the order details to calculate the risk score.";
+    riskResult.append(heading, message);
+}
+</script>
+
+</body>
+</html>

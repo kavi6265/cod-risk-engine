@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COD Risk Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 750px;
+            margin: 30px auto;
+            padding: 25px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 4px 15px #0001;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        input, select {
+            box-sizing: border-box;
+            width: 100%;
+            padding: 11px;
+            margin-top: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            margin-top: 20px;
+            border-radius: 7px;
+            cursor: pointer;
+        }
+
+        nav {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        nav a {
+            margin: 10px;
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        pre {
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>COD Risk Engine</h1>
+    <p>Cash-on-Delivery Order Risk Assessment</p>
+</header>
+
+<nav>
+    <a href="/">Home</a>
+    <a href="/dashboard">Dashboard</a>
+    <a href="/chat">WhatsApp Simulator</a>
+</nav>
+
+<main>
+    <h2>Assess Customer Order</h2>
+    <p>Enter order details to evaluate return-to-origin (RTO) risk.</p>
+
+    <form id="orderForm">
+        <label>Customer Name</label>
+        <input name="customer_name" value="Ravi Kumar" required>
+
+        <label>Address</label>
+        <input name="address"
+               value="12 Main Road, Salem, Tamil Nadu" required>
+
+        <label>Previous RTO Count</label>
+        <input name="customer_prior_rto" type="number"
+               min="0" value="2" required>
+
+        <label>State</label>
+        <input name="state" value="Bihar" required>
+
+        <label>Courier</label>
+        <select name="courier">
+            <option>Delhivery</option>
+            <option>Xpressbees</option>
+            <option>Ecom Express</option>
+            <option>BlueDart</option>
+        </select>
+
+        <label>Marketing Source</label>
+        <select name="utm_source">
+            <option value="direct">Direct</option>
+            <option value="meta_ads">Meta Ads</option>
+            <option value="google_ads">Google Ads</option>
+            <option value="instagram_organic">Instagram Organic</option>
+            <option value="whatsapp_broadcast">WhatsApp Broadcast</option>
+        </select>
+
+        <button type="submit">Assess Risk</button>
+    </form>
+
+    <section id="result" hidden>
+        <h3>Assessment Result</h3>
+        <pre id="output"></pre>
+    </section>
+</main>
+
+<script>
+document.getElementById("orderForm").addEventListener("submit",
+    async function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(event.target);
+        const order = Object.fromEntries(formData.entries());
+
+        order.customer_prior_rto =
+            Number(order.customer_prior_rto);
+
+        try {
+            const response = await fetch("/assess", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(order)
+            });
+
+            const data = await response.json();
+
+            document.getElementById("result").hidden = false;
+            document.getElementById("output").textContent =
+                JSON.stringify(data, null, 2);
+        } catch (error) {
+            alert("Could not connect to the Flask server.");
+        }
+    }
+);
+</script>
+
+</body>
+</html>

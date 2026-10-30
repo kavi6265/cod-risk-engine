@@ -1,0 +1,29 @@
+
+{
+  "thresholds": {
+    "ship_max": 24,
+    "confirm_max": 44,
+    "prepaid_max": 69
+  },
+  "weights": {
+    "previous_rto_1": 15,
+    "previous_rto_2_plus": 40,
+    "high_risk_state": 15,
+    "medium_risk_state": 8,
+    "high_risk_courier": 5,
+    "meta_ads": 3,
+    "incomplete_address": 20,
+    "suspicious_name": 35
+  },
+  "high_risk_states": [
+    "Bihar",
+    "Uttar Pradesh"
+  ],
+  "medium_risk_states": [
+    "Madhya Pradesh",
+    "Assam"
+  ],
+  "high_risk_couriers": [
+    "Xpressbees"
+  ]
+}

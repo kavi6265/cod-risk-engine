@@ -1,0 +1,614 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>COD Risk Engine Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #172b4d;
+            margin: 0;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin: 0 0 15px;
+        }
+
+        h2 {
+            font-size: 24px;
+            margin: 30px 0 18px;
+        }
+
+        .back-link {
+            display: inline-block;
+            color: #2563eb;
+            text-decoration: none;
+            margin: 12px 0 28px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Summary cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px #0000000d;
+            min-width: 0;
+        }
+
+        .metric-label {
+            font-size: 18px;
+            color: #334155;
+            line-height: 1.4;
+        }
+
+        .metric-value {
+            font-size: clamp(23px, 2vw, 32px);
+            font-weight: bold;
+            margin-top: 14px;
+            overflow-wrap: anywhere;
+        }
+
+        /* Tables */
+        .table-card {
+            background: white;
+            border-radius: 12px;
+            overflow-x: auto;
+            box-shadow: 0 5px 15px #0000000d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #dbeafe;
+            font-weight: bold;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Charts */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 22px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 5px 15px #0000000d;
+            min-width: 0;
+        }
+
+        .chart-card h3 {
+            margin: 0 0 20px;
+            font-size: 19px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+        }
+
+        /* Experiment impact */
+        .experiment-impact {
+            margin-top: 30px;
+            padding: 24px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px #0000000d;
+        }
+
+        .experiment-impact h2 {
+            margin-top: 0;
+        }
+
+        .experiment-intro {
+            color: #475569;
+            line-height: 1.6;
+        }
+
+        .experiment-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .experiment-card {
+            min-width: 0;
+            padding: 18px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+        }
+
+        .experiment-label {
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .experiment-value {
+            margin-top: 12px;
+            font-size: clamp(22px, 2vw, 30px);
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .experiment-caption {
+            margin-top: 8px;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .experiment-empty {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 10px;
+            background: #f8fafc;
+            line-height: 1.6;
+        }
+
+        .experiment-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            border-radius: 8px;
+            color: #475569;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .note {
+            background: #fff7ed;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            margin-top: 25px;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 35px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 1100px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .experiment-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 750px) {
+            body {
+                padding: 16px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                height: 280px;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header>
+        <h1>COD Risk Engine Dashboard</h1>
+    </header>
+
+    <a class="back-link" href="/">&#8592; Back to Home</a>
+
+    <!-- Summary metrics -->
+    <section class="metrics-grid">
+
+        <div class="metric-card">
+            <div class="metric-label">Finalized Orders</div>
+            <div class="metric-value">
+                {{ total_orders }}
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-label">Delivered Orders</div>
+            <div class="metric-value">
+                {{ delivered }}
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-label">RTO Orders</div>
+            <div class="metric-value">
+                {{ rto }}
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-label">Overall RTO Rate</div>
+            <div class="metric-value">
+                {{ rto_rate }}%
+            </div>
+        </div>
+
+        <div class="metric-card">
+            <div class="metric-label">Estimated RTO Costs</div>
+            <div class="metric-value">
+                &#8377;{{ rto_cost }}
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Historical decision table -->
+    <section>
+        <h2>Historical Outcomes by Decision</h2>
+
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Decision</th>
+                        <th>Orders</th>
+                        <th>RTO Count</th>
+                        <th>RTO Rate</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in decisions %}
+                    <tr>
+                        <td>{{ item.decision }}</td>
+                        <td>{{ item.orders }}</td>
+                        <td>{{ item.rto_count }}</td>
+                        <td>{{ item.rto_rate }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Visual analytics -->
+    <section>
+        <h2>Visual Analytics</h2>
+
+        <div class="chart-grid">
+
+            <div class="chart-card">
+                <h3>Delivered vs RTO Orders</h3>
+                <div class="chart-container">
+                    <canvas id="outcomeChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>RTO Rate by Decision</h3>
+                <div class="chart-container">
+                    <canvas id="decisionChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>Top 10 States by RTO Rate</h3>
+                <div class="chart-container">
+                    <canvas id="stateChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>RTO Rate by Courier</h3>
+                <div class="chart-container">
+                    <canvas id="courierChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <div class="note">
+        <strong>Important:</strong> RTO costs are estimates based on the
+        configured cost per return. Historical RTO rates show associations
+        and do not establish that the recommended actions will reduce
+        future returns. Consider order counts when comparing categories.
+    </div>
+
+   
+</div>
+
+<script>
+    // Data generated by the Flask dashboard route
+    const outcomeCounts = {{ outcome_counts | tojson }};
+    const decisions = {{ decisions | tojson }};
+    const stateLabels = {{ state_labels | tojson }};
+    const stateRates = {{ state_rates | tojson }};
+    const courierLabels = {{ courier_labels | tojson }};
+    const courierRates = {{ courier_rates | tojson }};
+
+    // Chart defaults
+    Chart.defaults.font.family = "Arial, sans-serif";
+    Chart.defaults.plugins.legend.position = "bottom";
+
+    // 1. Delivered vs RTO orders
+    new Chart(document.getElementById("outcomeChart"), {
+        type: "doughnut",
+        data: {
+            labels: Object.keys(outcomeCounts),
+            datasets: [{
+                label: "Orders",
+                data: Object.values(outcomeCounts)
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data
+                                .reduce((sum, value) => sum + value, 0);
+
+                            const percent = total
+                                ? (context.raw / total * 100).toFixed(2)
+                                : "0.00";
+
+                            return context.label + ": " +
+                                context.raw + " (" + percent + "%)";
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    // 2. Historical RTO rate by decision
+    new Chart(document.getElementById("decisionChart"), {
+        type: "bar",
+        data: {
+            labels: decisions.map(item => item.decision),
+            datasets: [{
+                label: "RTO Rate (%)",
+                data: decisions.map(item => item.rto_rate)
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "RTO Rate (%)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // 3. Top 10 states by historical RTO rate
+    new Chart(document.getElementById("stateChart"), {
+        type: "bar",
+        data: {
+            labels: stateLabels,
+            datasets: [{
+                label: "RTO Rate (%)",
+                data: stateRates
+            }]
+        },
+        options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "RTO Rate (%)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+
+    // 4. Historical RTO rate by courier
+    new Chart(document.getElementById("courierChart"), {
+        type: "bar",
+        data: {
+            labels: courierLabels,
+            datasets: [{
+                label: "RTO Rate (%)",
+                data: courierRates
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: "RTO Rate (%)"
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+</script>
+    <section class="experiment-impact">
+        <h2>Experiment Impact</h2>
+        <p class="experiment-intro">
+            Compare finalized COD orders in the control group with orders
+            assigned to the intervention group.
+        </p>
+
+        {% if experiment_impact.available %}
+        <div class="experiment-grid">
+            <div class="experiment-card">
+                <div class="experiment-label">Control RTO Rate</div>
+                <div class="experiment-value">{{ experiment_impact.control_rto_rate }}%</div>
+                <div class="experiment-caption">
+                    {{ experiment_impact.control_count }} finalized orders
+                </div>
+            </div>
+
+            <div class="experiment-card">
+                <div class="experiment-label">Intervention RTO Rate</div>
+                <div class="experiment-value">{{ experiment_impact.intervention_rto_rate }}%</div>
+                <div class="experiment-caption">
+                    {{ experiment_impact.intervention_count }} finalized orders
+                </div>
+            </div>
+
+            <div class="experiment-card">
+                <div class="experiment-label">Absolute Reduction</div>
+                <div class="experiment-value">
+                    {{ experiment_impact.absolute_reduction }} pp
+                </div>
+                <div class="experiment-caption">
+                    Control rate minus intervention rate
+                </div>
+            </div>
+
+            <div class="experiment-card">
+                <div class="experiment-label">Relative Reduction</div>
+                <div class="experiment-value">
+                    {{ experiment_impact.relative_reduction }}%
+                </div>
+                <div class="experiment-caption">
+                    Relative to the control RTO rate
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="experiment-empty">
+            <strong>Experiment results are not available yet.</strong>
+            <p>
+                Add finalized orders from both the control and intervention
+                groups to <code>experiment_results.csv</code>. The dashboard
+                will calculate the comparison automatically.
+            </p>
+            <p>
+                Current group counts:
+                Control: {{ experiment_impact.control_count }},
+                Intervention: {{ experiment_impact.intervention_count }}.
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="experiment-note">
+            <strong>How to interpret this:</strong>
+            A positive reduction means the intervention group had a lower
+            observed RTO rate than the control group. It does not prove
+            causation on its own. Randomly assign eligible orders to groups,
+            use the same outcome window, and collect enough finalized orders
+            before making a causal claim. Do not populate experiment groups
+            with guessed historical assignments.
+        </div>
+    </section>
+     <footer>
+        COD Risk Engine &mdash; Order Risk Analytics
+    </footer>
+
+</body>
+</html>
